@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <cassert>
 
 using namespace std;
 
@@ -18,6 +19,19 @@ typedef pair<int, int> pii;
 #define mp make_pair
 
 const int Alphabet_size = 27;
+
+const int MAX_MEM = 1e8;
+int mpos = 0;
+char mem[MAX_MEM];
+
+inline void * operator new ( size_t n ) {
+	char *res = mem + mpos;
+	mpos += n;
+	assert(mpos <= MAX_MEM);
+	return (void *)res;
+}
+
+inline void operator delete ( void * ) { }
 
 struct Node {
 	Node* parent;
@@ -40,7 +54,6 @@ struct Node {
 		depth = _depth;
 	}
 	~Node() {
-	//	cout << "deleted" << endl;	
 	}
 };
 
@@ -177,12 +190,13 @@ int main() {
 	string str;
 	cin >> str;
 
+
 	for (int i = 0; i < (int)str.size(); i++) {
+		mpos = 0;
 		SuffixTree tree(str, i, (i + k - 1) % (int)str.size(), k);
 		cout << tree.getdiffStr() << ' ';
 	}
-	cout << endl;
-	//cout << (double)clock() / CLOCKS_PER_SEC << endl;                                    
+	cout << endl;                                   
 		
 
 	return 0;
