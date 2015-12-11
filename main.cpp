@@ -54,6 +54,9 @@ struct Node {
 		depth = _depth;
 	}
 	~Node() {
+		//cerr << "!" << endl;
+		for (int i = 0; i < (int)children.size(); i++)
+			delete children[i];
 	}
 };
 
@@ -61,7 +64,7 @@ class SuffixTree {
 private:
 	Node* root;
 	Node* head;
-	int diffStr;
+	int differentSubStrings;
 	string s;
 		
 	Node* AddSuffix(Node* head, int i);
@@ -70,17 +73,12 @@ private:
 
 public:
 	void go(Node* cur, int dp);
-	int getdiffStr();
+	int getdifferentSubStrings();
 	SuffixTree() {}
 	SuffixTree(const string& Str, int l, int r, int k);
-	~SuffixTree() {}
-	void delet(Node* cur) {
-		if (cur == NULL)
-			return;
-		for (int i = 0; i < Alphabet_size; i++)
-			delet(cur->children[i]);
-		delete cur;
-	}	
+	~SuffixTree() {
+		mpos = 0;
+	}
 };
 
 void SuffixTree::go(Node* cur, int dp) {
@@ -114,12 +112,12 @@ SuffixTree::SuffixTree(const string& Str, int l, int r, int k) {
 	root = new Node(NULL, 0, -1, 0);
 	root->suffLink = root;
 	head = root;
-	diffStr = 0;
+	differentSubStrings = 0;
 
 	for (int i = 0; i < n; i++) {
 		head = AddSuffix(head, i);
 	}	
-	delet(root);
+	delete root;
 }
 
 Node* SuffixTree::Split(Node* cur, int len) {
@@ -154,7 +152,7 @@ Node* SuffixTree::AddSuffix(Node* head, int i) {
 	}
 	if (left < (int)s.size()) {
 		head->children[s[left] - 'a' + 1] = new Node(head, left, s.size() - 1, head->depth + s.size() - left);
-		diffStr += s.size() - left;
+		differentSubStrings += s.size() - left;
 	}
 	return head;
 }
@@ -180,8 +178,8 @@ void SuffixTree::GetSuffLink(Node* node) {
 	node->suffLink = cur;
 }
 
-int SuffixTree::getdiffStr() {
-	return diffStr - s.size();
+int SuffixTree::getdifferentSubStrings() {
+	return differentSubStrings - s.size();
 }
 
 int main() {
@@ -192,9 +190,8 @@ int main() {
 
 
 	for (int i = 0; i < (int)str.size(); i++) {
-		mpos = 0;
 		SuffixTree tree(str, i, (i + k - 1) % (int)str.size(), k);
-		cout << tree.getdiffStr() << ' ';
+		cout << tree.getdifferentSubStrings() << ' ';		
 	}
 	cout << endl;                                   
 		
